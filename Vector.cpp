@@ -30,6 +30,12 @@ Vector& Vector::operator=(Vector other)
     return *this;
 }
 
+Vector::~Vector()
+{
+    if (is_big)
+        _data.big.~big_data();
+}
+
 void Vector::set_size()
 {
     if (!is_big && _size > START_SIZE)
@@ -106,12 +112,6 @@ const uint32_t &Vector::operator[](size_t id) const
 size_t Vector::size() const
 {
     return _size;
-}
-
-Vector::~Vector()
-{
-    if (is_big)
-        _data.big.~big_data();
 }
 
 void Vector::change()
