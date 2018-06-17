@@ -12,7 +12,6 @@ class Vector
         Vector(const Vector& other);
         Vector& operator=(Vector other);
 
-        void swap(Vector& other) noexcept;
         void pop_back();
         void set_size();
         void resize(size_t sz);
