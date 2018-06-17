@@ -37,7 +37,7 @@ void Vector::set_size()
         size_t new_cap = START_SIZE;
         while (new_cap < _size)
             new_cap *= 2;
-        uint32_t* tmp = new uint32_t[new_cap];
+        auto *tmp = new uint32_t[new_cap];
         memcpy(tmp, _data.small, START_SIZE * sizeof(uint32_t));
         new (&_data.big) big_data(new_cap, std::shared_ptr<uint32_t>(tmp, std::default_delete<uint32_t>()));
         is_big = true;
@@ -48,7 +48,7 @@ void Vector::set_size()
         size_t new_cap = _data.big._cap;
         while (new_cap < _size)
             new_cap *= 2;
-        uint32_t* tmp = new uint32_t[new_cap];
+        auto *tmp = new uint32_t[new_cap];
         memcpy(tmp, _data.big.ptr.get(), old_cap * sizeof(uint32_t));
         _data.big.ptr = std::shared_ptr<uint32_t>(tmp, std::default_delete<uint32_t>());
         _data.big._cap = new_cap;
@@ -108,11 +108,17 @@ size_t Vector::size() const
     return _size;
 }
 
+Vector::~Vector()
+{
+    if (is_big)
+        _data.big.~big_data();
+}
+
 void Vector::change()
 {
     if (!is_big || _data.big.ptr.unique())
         return;
-    uint32_t* tmp = new uint32_t[_data.big._cap];
+    auto *tmp = new uint32_t[_data.big._cap];
     memcpy(tmp, _data.big.ptr.get(), _data.big._cap * sizeof(uint32_t));
     _data.big.ptr = std::shared_ptr<uint32_t>(tmp, std::default_delete<uint32_t>());
 }

@@ -7,6 +7,7 @@ class Vector
 {
     public:
         Vector();
+        ~Vector();
         Vector(const Vector& other);
         Vector& operator=(Vector other);
 
