@@ -545,7 +545,7 @@ std::string to_string(big_integer const& a)
     }
     if (a.sign)
         s += '-';
-    reverse(s.begin(), s.end());
+    std::reverse(s.begin(), s.end());
     return s;
 }
 

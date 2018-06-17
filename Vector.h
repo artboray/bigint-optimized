@@ -2,6 +2,7 @@
 #define BIGINT_VECTOR_H
 
 #include <memory>
+#include <cstring>
 
 class Vector
 {

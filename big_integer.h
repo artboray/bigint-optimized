@@ -3,6 +3,7 @@
 
 #include <iosfwd>
 #include <vector>
+#include <algorithm>
 #include "Vector.h"
 
 const unsigned long long BASE = 4294967296U;
