@@ -45,8 +45,9 @@ void Vector::set_size()
         while (new_cap < _size)
             new_cap *= 2;
         auto *tmp = new uint32_t[new_cap];
+        // без сишных
         memcpy(tmp, _data.small, START_SIZE * sizeof(uint32_t));
-        new (&_data.big) big_data(new_cap, std::shared_ptr<uint32_t>(tmp, std::default_delete<uint32_t>()));
+        new (&_data.big) big_data(new_cap, std::shared_ptr<uint32_t>(tmp, std::default_delete<uint32_t[]>()));
         is_big = true;
     }
     else if (is_big && _size > _data.big._cap)
@@ -57,7 +58,7 @@ void Vector::set_size()
             new_cap *= 2;
         auto *tmp = new uint32_t[new_cap];
         memcpy(tmp, _data.big.ptr.get(), old_cap * sizeof(uint32_t));
-        _data.big.ptr.reset(tmp, std::default_delete<uint32_t>());
+        _data.big.ptr.reset(tmp, std::default_delete<uint32_t[]>());
         _data.big._cap = new_cap;
     }
 }
@@ -68,6 +69,7 @@ void Vector::resize(size_t size)
     size_t old_size = _size;
     _size = size;
     set_size();
+    // std::fill
     for (size_t i = old_size; i < size; i++)
         (*this)[i] = 0;
 }
@@ -121,5 +123,5 @@ void Vector::change()
         return;
     auto *tmp = new uint32_t[_data.big._cap];
     memcpy(tmp, _data.big.ptr.get(), _data.big._cap * sizeof(uint32_t));
-    _data.big.ptr.reset(tmp, std::default_delete<uint32_t>());
+    _data.big.ptr.reset(tmp, std::default_delete<uint32_t[]>());
 }
