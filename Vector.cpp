@@ -60,7 +60,7 @@ void Vector::resize(size_t size)
     change();
     size_t old_size = _size;
     _size = size;
-    (*this).set_size();
+    set_size();
     for (size_t i = old_size; i < size; i++)
         (*this)[i] = 0;
 }
@@ -69,7 +69,7 @@ void Vector::push_back(uint32_t val)
 {
     change();
     _size++;
-    (*this).set_size();
+    set_size();
     (*this)[_size - 1] = val;
 }
 

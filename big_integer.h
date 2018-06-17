@@ -2,6 +2,7 @@
 #define BIG_INTEGER_H
 
 #include <iosfwd>
+#include <vector>
 #include "Vector.h"
 
 const unsigned long long BASE = 4294967296U;
@@ -15,6 +16,7 @@ struct big_integer
     explicit big_integer(uint32_t a);
     explicit big_integer(std::string const& str);
     ~big_integer();
+    void remove_zero();
 
     big_integer& operator=(big_integer const& other);
 

@@ -2,28 +2,24 @@
 
 #include <iostream>
 
-big_integer::big_integer()
+big_integer::big_integer() : sign(0)
 {
     _digits.clear();
     _digits.push_back(0);
-    sign = 0;
 }
 
-big_integer::big_integer(big_integer const& other)
+big_integer::big_integer(big_integer const& other) : sign(other.sign)
 {
     _digits = other._digits;
-    sign = other.sign;
 }
 
-big_integer::big_integer(uint32_t a)
+big_integer::big_integer(uint32_t a) : sign(0)
 {
-    sign = 0;
     _digits.push_back(a);
 }
 
-big_integer::big_integer(int a)
+big_integer::big_integer(int a) : sign(a < 0)
 {
-    sign = a < 0;
     _digits.push_back(std::abs(a));
 }
 
@@ -54,6 +50,12 @@ big_integer::big_integer(std::string const& str)
     }
     if ((str[0] == '-') && (*this != 0))
         sign = 1;
+}
+
+void big_integer::remove_zero()
+{
+    while ((_digits.size() > 1) && (_digits[_digits.size() - 1] == 0))
+        _digits.pop_back();
 }
 
 big_integer& big_integer::operator+=(big_integer const& rhs)
@@ -90,8 +92,7 @@ big_integer& big_integer::operator+=(big_integer const& rhs)
         _digits[i] = (uint32_t)cur;
     }
 
-    while ((_digits.size() > 1) && (_digits[_digits.size() - 1] == 0))
-        _digits.pop_back();
+    remove_zero();
     return *this;
 }
 
@@ -132,8 +133,7 @@ big_integer& big_integer::operator-=(big_integer const& rhs)
         if (carry) a += (int64_t)BASE;
         _digits[i] = (uint32_t)a;
     }
-    while ((_digits.size() > 1) && (_digits[_digits.size() - 1] == 0))
-        _digits.pop_back();
+    remove_zero();
 
     return *this;
 }
@@ -160,8 +160,7 @@ big_integer& big_integer::operator*=(big_integer const& rhs)
         }
     }
 
-    while ((tmp._digits.size() > 1) && (tmp._digits[tmp._digits.size() - 1] == 0))
-        tmp._digits.pop_back();
+    tmp.remove_zero();
 
     *this = tmp;
     return *this;
@@ -183,8 +182,7 @@ big_integer divide(big_integer a, int64_t const& b)
         a._digits[i] = (uint32_t)(cur / b);
         carry = (uint64_t)(cur % b);
     }
-    while (a._digits.size() > 1 && a._digits[a._digits.size() - 1] == 0)
-        a._digits.pop_back();
+    a.remove_zero();
     return a;
 }
 
@@ -231,7 +229,7 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
     *this *= big_integer(d);
     b *= big_integer(d);
     uint32_t len = (uint32_t)(_digits.size() - b._digits.size() + 1);
-    int n = _digits.size(), m = b._digits.size();
+    size_t n = _digits.size(), m = b._digits.size();
     big_integer c;
     c._digits.resize(len);
     big_integer tmp;
@@ -260,16 +258,13 @@ big_integer& big_integer::operator/=(big_integer const& rhs)
         tmp -= div;
         while (tmp._digits.size() < m + 1)
             tmp._digits.push_back(0);
-        for (int j = m; j > 0; j--)
+        for (size_t j = m; j > 0; j--)
             tmp._digits[j] = tmp._digits[j - 1];
-        while (tmp._digits.size() > 1 && tmp._digits[tmp._digits.size() - 1] == 0)
-            tmp._digits.pop_back();
+        tmp.remove_zero();
         c._digits[len - i - 1] = cur;
     }
 
-    while (c._digits.size() > 1 && c._digits[c._digits.size() - 1] == 0)
-        c._digits.pop_back();
-
+    c.remove_zero();
     c.sign = sgn;
     *this = c;
     return *this;
@@ -325,8 +320,7 @@ big_integer& big_integer::operator&=(big_integer const& rhs)
     b = bool_operation_prepare(b);
     for (int i = 0; i < _digits.size(); i++)
         _digits[i] &= b._digits[i];
-    while (_digits.size() > 1 && _digits[_digits.size() - 1] == 0)
-        _digits.pop_back();
+    remove_zero();
     *this = bool_operation_end(*this, sgn);
     return *this;
 }
@@ -341,8 +335,7 @@ big_integer& big_integer::operator|=(big_integer const& rhs)
     b = bool_operation_prepare(b);
     for (int i = 0; i < _digits.size(); i++)
         _digits[i] |= b._digits[i];
-    while (_digits.size() > 1 && _digits[_digits.size() - 1] == 0)
-        _digits.pop_back();
+    remove_zero();
     *this = bool_operation_end(*this, sgn);
     return *this;
 }
@@ -357,8 +350,7 @@ big_integer& big_integer::operator^=(big_integer const& rhs)
     b = bool_operation_prepare(b);
     for (int i = 0; i < _digits.size(); i++)
         _digits[i] ^= b._digits[i];
-    while (_digits.size() > 1 && _digits[_digits.size() - 1] == 0)
-        _digits.pop_back();
+    remove_zero();
     *this = bool_operation_end(*this, sgn);
     return *this;
 }
@@ -371,8 +363,7 @@ big_integer& big_integer::operator<<=(int rhs)
         _digits[i] = _digits[i - shl];
     for (int i = 0; i < shl; i++)
         _digits[i] = 0;
-    while ((_digits.size() > 1) && (_digits[_digits.size() - 1] == 0))
-        _digits.pop_back();
+    remove_zero();
     *this *= (1 << (rhs % 32));
     if (abs(*this) == 0)
         sign = 0;
@@ -381,12 +372,11 @@ big_integer& big_integer::operator<<=(int rhs)
 
 big_integer& big_integer::operator>>=(int rhs)
 {
-    uint32_t shl = rhs / 32;
+    int shl = rhs / 32;
     for (int i = 0; i < _digits.size() - shl; i++)
         _digits[i] = _digits[i + shl];
     _digits.resize(std::min(_digits.size(), _digits.size() - shl));
-    while ((_digits.size() > 1) && (_digits[_digits.size() - 1] == 0))
-        _digits.pop_back();
+    remove_zero();
     if (mod(*this, (uint32_t)(1 << (rhs % 32))) != 0 && sign)
         *this -= big_integer((uint32_t)(1ll << (rhs % 32)));
     *this = divide(*this, (uint32_t)(1ll << (rhs % 32)));
@@ -517,7 +507,7 @@ bool operator<(big_integer const& a, big_integer const& b)
         return !a.sign;
     if (a._digits.size() > b._digits.size())
         return a.sign;
-    int pos = a._digits.size() - 1;
+    size_t pos = a._digits.size() - 1;
     while (a._digits[pos] == b._digits[pos])
         pos--;
     if (a._digits[pos] < b._digits[pos])

@@ -1,16 +1,14 @@
-#ifndef _BIGINT_SRC_VECTOR32_T_H_
-#define _BIGINT_SRC_VECTOR32_T_H_
+#ifndef BIGINT_VECTOR_H
+#define BIGINT_VECTOR_H
 
-#include <cstddef>
 #include <memory>
-#include <functional>
 
 class Vector
 {
     public:
         Vector();
-        Vector(const Vector& src);
-        Vector& operator=(Vector src);
+        Vector(const Vector& other);
+        Vector& operator=(Vector other);
 
         void swap(Vector& other) noexcept;
         void pop_back();
