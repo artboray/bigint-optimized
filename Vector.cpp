@@ -1,6 +1,7 @@
 #include "Vector.h"
 
 #include <iostream>
+#include <cstring>
 
 Vector::Vector() : _size(0), is_big(false) {}
 

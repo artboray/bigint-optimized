@@ -1,6 +1,7 @@
 #include "big_integer.h"
 
 #include <iostream>
+#include <algorithm>
 
 big_integer::big_integer() : sign(0)
 {
@@ -545,7 +546,7 @@ std::string to_string(big_integer const& a)
     }
     if (a.sign)
         s += '-';
-    reverse(s.begin(), s.end());
+    std::reverse(s.begin(), s.end());
     return s;
 }
 
