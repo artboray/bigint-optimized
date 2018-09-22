@@ -364,7 +364,8 @@ big_integer& big_integer::operator<<=(int rhs)
     for (int i = 0; i < shl; i++)
         _digits[i] = 0;
     remove_zero();
-    *this *= (1 << (rhs % 32));
+    big_integer a = big_integer((uint32_t)1 << (__uint32_t)(rhs % 32));
+    *this *= a;
     if (abs(*this) == 0)
         sign = 0;
     return *this;
